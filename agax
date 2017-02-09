@@ -2,8 +2,11 @@
   修改后可使雷达图tooltips显示单轴（极）数据信息,需要的话,对雷达图formatter的重设也在这里.
 */
 
-//调用部分,即修改部分（大概位置L31540）：
 
+//参数e在调用处添加的（大约在源代码L50526）:
+var defaultHtml = seriesModel.formatTooltip(dataIndex, e, false, dataType);
+
+//调用部分,即修改部分（大概位置L31540）:
 formatTooltip: function (dataIndex,e) {
 	            var value = this.getRawValue(dataIndex);
 	            var coordSys = this.coordinateSystem;
