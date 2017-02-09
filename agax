@@ -1,0 +1,67 @@
+/*对echarts.js(官网下载)做修改:
+  修改后可使雷达图tooltips显示单轴（极）数据信息,需要的话,对雷达图formatter的重设也在这里.
+*/
+
+//调用部分,即修改部分（大概位置L31540）：
+
+formatTooltip: function (dataIndex,e) {
+	            var value = this.getRawValue(dataIndex);
+	            var coordSys = this.coordinateSystem;
+	            //get index by position of mouse.
+	            var index = getIndexToDisplay(value.length,getAngle(e.offsetX,e.offsetY,coordSys.cx,coordSys.cy));
+	            var indicatorAxes = coordSys.getIndicatorAxes();
+	            return indicatorAxes[index].name+ ' : ' + value[index]; //wangjx
+	            
+	            //region code, display all data of this series.
+	            /*return (this._data.getName(dataIndex) == '' ? this.name : this._data.getName(dataIndex)) + '<br/>'
+	                + zrUtil.map(indicatorAxes, function (axis, idx) {
+	                    return axis.name + ' : ' + value[idx];
+	                }).join('<br />');*/
+	        },
+          
+ //计算角度判断index部分:
+//@wangjx
+	    //compute the anti-clockwise angle of mousePos-coordinate -- Y-line. 
+	    var getAngle = function(mx,my,px,py){
+        	var x = Math.abs(px-mx);
+        	var y = Math.abs(py-my);
+        	var z = Math.sqrt(Math.pow(x,2)+Math.pow(y,2));
+        	var cos = y/z;
+        	var radina = Math.acos(cos);
+        	var angle = Math.floor(180/(Math.PI/radina));
+        	if(mx>px && my>py){
+        		angle = 180-angle;
+        	}
+        	if(mx==px && my>py){
+        		angle = 180;
+        	}
+        	if(mx>px && my==py){
+        		angle = 90;
+        	}
+        	if(mx<px && my>py){
+        		angle = 180+angle;
+        	}
+        	if(mx<px && my==py){
+        		angle = 270;
+        	}
+        	if(mx<px && my<py){
+        		angle = 360-angle;
+        	}
+        	//the Echarts radar turns anti-clockwise.
+        	return 360-angle;
+        };
+        
+        //@wangjx
+        //get index by angle;
+        var getIndexToDisplay = function(num,angle){
+        	var filterIndex =0;
+        	for(var i=0; i<num; i++){
+        		if(angle>(360/num*i-360/num/2) && angle<(360/num*i+360/num/2)){
+        			filterIndex = i;
+        			break;
+        		}
+        	}
+        	return filterIndex;
+        };
+        
+        
